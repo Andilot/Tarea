@@ -7,12 +7,12 @@ Original file is located at
     https://colab.research.google.com/drive/1_B1Yk6d68_aDzCkyLGZ0mFKLs3UJfJwQ
 """
 
-#ejemplos de entradas (la entrada a7 se considera de parentesis bien formados
-#puesto que para cada parentesis abierto, hay uno cerrado a su derecha, al
-#mismo tiempo que no hay caracteres no parentesis como el espacio o la letra
-# "a")
-prueba=["()))", ")(", "(()())(())", "(a)a", " ",
-        "(  )", "", "())", "(()", "(", ")"]
+#ejemplos de entradas (la septima entrada se considera de parentesis bien
+#formados puesto que para cada parentesis abierto, hay uno cerrado a su
+#derecha, al mismo tiempo que no hay caracteres no parentesis como el espacio
+#o la letra "a")
+prueba=["()))", ")(", "(()())(())()", "(a)a", " ", "(  )", "",
+        "())", "(()", "(", ")", "(())(()())", "()()()()()()()()aa"]
 
 #Se define la funcion
 def parentesis(cadena1):
@@ -31,70 +31,127 @@ def parentesis(cadena1):
   #Esta sirve para transformar la cadena en lista, que en mi opinion es mas
   #facil de manejar
   cadena2=list(cadena1)
+  cadena3=list(cadena1)
+  #mas adelante descartara cadenas con parentesis insuficientes
+  m=len(cadena1)%2
+
+  #Servira para recorrer listas en whiles
+  longitud = len(cadena1) - 1
   h=0
   i=0
   l=0
+  n=0
 
-  #Sirve para recorrer toda la lista
-  longitud = len(cadena1) - 1
+  #recorre la lista con indice h
   while h <= longitud:
 
     #detecta caracteres no parentesis
-    if cadena1[h] not in alfabeto:
+    if cadena3[h] != ")" and cadena3[h] != "(":
       booleano = False
-      print('no metiste solo parentesis')
+      print('No metiste solo parentesis')
 
       #cierra el ciclo apenas salga una "impureza" y evita que se imprima el
-      #otro mensaje de error
+      #un mensaje de error distinto
       h = longitud + 2
+
     else:
 
-      #recorre la lista
-      h = h + 1
-      while i <= longitud:
+      #descarta cadenas de longitud impar (la cantidad debe ser par puesto que
+      #no hay caracteres adicionales y hay 2k parentesis en total)
+      if m != 0:
+        h=longitud+3
+        print('Hay al menos un parentesis sin pareja')
+        booleano = False
 
-        #detecta un primer parentesis abierto
-        if cadena2[i] == "(":
+      #descarta cadenas que no empiezan con un parentesis abierto, el h==0 es
+      #por que mas adelante se modificara el primer parentesis para
+      #identificarlo con que ya tiene pareja y el codigo no se confunda con que
+      #empieza sin parentesis abierto
+      elif cadena2[0] != "(" and h==0:
+            h=longitud+3
+            print('Hay al menos un parentesis sin pareja')
+            booleano = False
+      else:
 
-          #posicion siguiente al parentesis abierto
-          j= i + 1
+        #despues de descartar casos mas generales
+        #empieza a detectar a profundidad
+        while n < longitud:
 
-          #busca parentesis cerrados que completen al abierto
-          while j <= longitud:
-            if cadena2[j] == ")":
+          #detecta un primer parentesis abierto
+          if cadena2[i] == "(":
 
-              #descarta de la lista la pareja encontrada guardando la pareja
-              #encontrada en la lista
-              cadena2[i] = "a"
-              cadena2[j] = "a"
+            #posicion siguiente parentesis
+            j= i + 1
 
-               #cierra el ciclo para buscar otro parentesis abierto y repetir
-               #el proceso
-              j = longitud+1
+            #busca parentesis cerrados que completen al abierto y en caso de
+            #encontrar otro parentesis abierto, le da prioridad para buscarle
+            #pareja
+            while j <= longitud:
+
+              #aqui cambia de prioridad
+              if cadena2[j] == "(":
+                i=j
+                j=j+1
+
+              #detecta el parentesis abierto anterior
+              elif cadena2[j] == ")":
+
+                #descarta de la lista  a la pareja encontrada guardando
+                #la pareja encontrada en la lista como "a" (el programa
+                #no se confundira con entradas con "a" puesto que revisa en
+                #la cadena3 y no en la cadena2)
+                cadena2[i] = "a"
+                cadena2[j] = "a"
+
+                #regresa a i al principio para no olvidar primeros parentesis
+                i=0
+
+                #guarda la cantidad de parejas encontradas
+                n=n+2
+
+                #cierra el ciclo para buscar otro parentesis abierto y repetir
+                #el proceso
+                j = longitud+1
+              else:
+
+                #si encontro un "a" en la posicion actual, busca en la
+                #siguiente
+                j= j + 1
+
+              #print(cadena1) #esto de aqui sirve por si se requiere revisar
+              #print(cadena2) #el funcionamiento del programa
+              #print(cadena3)
+              #print(h, i, j, n)
+
+          #si el parentesis inicial fue descartado, la posicion i se mueve al
+          #siguiente parentesis abierto
+          else:
+            if i < longitud:
+              i=i+1
+
+            #si despues de recorrer i por toda la lista no encontro otro
+            #parentesis abierto, la siguiente linea cierra el ciclo
             else:
+              n=n+1
 
-              #si no encontro un cerrado en la posicion actual, busca en la
-              #siguiente
-              j= j + 1
+      #recorre la cadena3 en busca de caracteres no parentesis
+      h = h + 1
 
-        #despues de encontrar una pareja, busca otro parentesis abierto
-        i= i + 1
+      #activa el codigo siguiente en exactamente el ultimo ciclo while de h
+      if h == longitud+1:
 
-    #En la lista resultante verifica que cada parentesis encontro pareja
-    if h == longitud+1:
+        #recorre la nueva lista
+        while l <= longitud:
 
-      #recorre la nueva lista
-      while l <= longitud:
+          #detecta parejas incompletas
+          if cadena2[l] != "a":
+            booleano = False
+            print('Hay al menos un parentesis sin pareja')
 
-        #detecta parejas incompletas
-        if cadena2[l] not in alfabeto2:
-          booleano = False
-          print('hay al menos un parentesis sin pareja')
-
-        #cierra el ciclo apenas salga una "impureza"
-        l = longitud + 1
-    else:
-      l = l + 1
+          #cierra el ciclo apenas salga una "impureza"
+            l = longitud + 1
+          else:
+            l = l + 1
 
   #imprime el resultado
   if booleano:
@@ -103,10 +160,6 @@ def parentesis(cadena1):
     print('No es una cadena de parentesis bien formados, revise su cadena \n')
   return booleano
 
-  #por si se requiere buscar errores o ver parte del funcionamiento:
-  #print(cadena1)
-  #print(cadena2)
-
 #es la funcion que ejecuta a "parentesis" en todas las pruebas
 def main():
   for i in prueba:
@@ -114,4 +167,4 @@ def main():
 
 #ejecuta el codigo
 if __name__ == "__main__":
-    main()
+  main()
